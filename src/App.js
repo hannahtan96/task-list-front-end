@@ -1,36 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import TaskList from './components/TaskList.js';
 import './App.css';
-
-const TASKS = [
-  {
-    id: 1,
-    title: 'Mow the lawn',
-    isComplete: false,
-  },
-  {
-    id: 2,
-    title: 'Cook Pasta',
-    isComplete: true,
-  },
-];
+import axios from 'axios';
 
 const App = () => {
-  const [tasks, setTasks] = useState(TASKS);
+  const [tasks, setTasks] = useState([]);
+
+  const URL = 'http://127.0.0.1:5000/tasks';
+  useEffect(() => {
+    axios
+      .get(URL)
+      .then((res) => {
+        const taskAPIResCopy = res.data.map((task) => {
+          return {
+            id: task.id,
+            title: task.title,
+            description: task.description,
+            isComplete: task.is_complete,
+          };
+        });
+        setTasks(taskAPIResCopy);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   const markTaskComplete = (taskId, taskStatus) => {
     console.log('in markTaskComplete');
     // console.log(tasks);
     const newTaskList = [];
-    for (const task of tasks) {
-      if (task.id === taskId) {
-        const updatedTask = { ...task, isComplete: taskStatus };
-        newTaskList.push(updatedTask);
-      } else {
-        newTaskList.push(task);
-      }
-    }
-    setTasks(newTaskList);
+    axios
+      .patch(`${URL}/${taskId}/mark_complete`)
+      .then((res) => {
+        for (const task of tasks) {
+          if (task.id === taskId) {
+            const updatedTask = { ...task, isComplete: taskStatus };
+            newTaskList.push(updatedTask);
+          } else {
+            newTaskList.push(task);
+          }
+        }
+        setTasks(newTaskList);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const deleteTask = (taskId) => {
+    console.log('in deleteTask');
+    const updatedTaskList = [];
+    axios
+      .delete(`${URL}/${taskId}`)
+      .then((res) => {
+        for (const task of tasks) {
+          if (task.id !== taskId) {
+            updatedTaskList.push(task);
+          }
+        }
+        setTasks(updatedTaskList);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -40,7 +73,13 @@ const App = () => {
       </header>
       <main>
         <div>
-          {<TaskList tasks={tasks} markTaskComplete={markTaskComplete} />}
+          {
+            <TaskList
+              tasks={tasks}
+              markTaskComplete={markTaskComplete}
+              deleteTask={deleteTask}
+            />
+          }
         </div>
       </main>
     </div>
