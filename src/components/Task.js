@@ -4,17 +4,17 @@ import PropTypes from 'prop-types';
 import './Task.css';
 // import markTaskComplete
 
-const Task = (props) => {
+const Task = ({ key, id, title, isComplete, markTaskComplete }) => {
   // const [complete, setComplete] = useState(isComplete);
-  const buttonClass = props.isComplete ? 'tasks__item__toggle--completed' : '';
+  const buttonClass = isComplete ? 'tasks__item__toggle--completed' : '';
 
   return (
-    <li className="tasks__item">
+    <li className="tasks__item" key={key}>
       <button
         className={`tasks__item__toggle ${buttonClass}`}
-        onClick={() => props.markTaskComplete(props.id, !props.isComplete)}
+        onClick={() => markTaskComplete(id, !isComplete)}
       >
-        {props.title}
+        {title}
       </button>
       <button className="tasks__item__remove button">x</button>
     </li>
@@ -22,6 +22,7 @@ const Task = (props) => {
 };
 
 Task.propTypes = {
+  key: PropTypes.number.isRequired,
   id: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
   isComplete: PropTypes.bool.isRequired,

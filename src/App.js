@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TaskList from './components/TaskList.js';
 import './App.css';
 
@@ -17,9 +17,10 @@ const TASKS = [
 
 const App = () => {
   const [tasks, setTasks] = useState(TASKS);
+
   const markTaskComplete = (taskId, taskStatus) => {
     console.log('in markTaskComplete');
-    console.log(tasks);
+    // console.log(tasks);
     const newTaskList = [];
     for (const task of tasks) {
       if (task.id === taskId) {
