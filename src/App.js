@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import TaskList from './components/TaskList.js';
 import './App.css';
 import axios from 'axios';
+import NewTaskForm from './components/NewTaskForm.js';
 
 const App = () => {
   const [tasks, setTasks] = useState([]);
 
   const URL = 'http://127.0.0.1:5000/tasks';
-  useEffect(() => {
+
+  const getAllTasks = () => {
     axios
       .get(URL)
       .then((res) => {
@@ -24,7 +26,10 @@ const App = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  };
+
+  // const URL = 'http://127.0.0.1:5000/tasks';
+  useEffect(getAllTasks, []);
 
   const markTaskComplete = (taskId, taskStatus) => {
     console.log('in markTaskComplete');
@@ -66,6 +71,35 @@ const App = () => {
       });
   };
 
+  const addNewTask = (newTask) => {
+    console.log(newTask);
+    axios
+      .post(URL, newTask)
+      .then((res) => getAllTasks())
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  // const getAllTasks = () => {
+  //   axios
+  //     .get(URL)
+  //     .then((res) => {
+  //       const taskAPIResCopy = res.data.map((task) => {
+  //         return {
+  //           id: task.id,
+  //           title: task.title,
+  //           description: task.description,
+  //           isComplete: task.is_complete,
+  //         };
+  //       });
+  //       setTasks(taskAPIResCopy);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
+
   return (
     <div className="App">
       <header className="App-header">
@@ -73,13 +107,12 @@ const App = () => {
       </header>
       <main>
         <div>
-          {
-            <TaskList
-              tasks={tasks}
-              markTaskComplete={markTaskComplete}
-              deleteTask={deleteTask}
-            />
-          }
+          <TaskList
+            tasks={tasks}
+            markTaskComplete={markTaskComplete}
+            deleteTask={deleteTask}
+          />
+          <NewTaskForm addNewTaskCallback={addNewTask}></NewTaskForm>
         </div>
       </main>
     </div>
